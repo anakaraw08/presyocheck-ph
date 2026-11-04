@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presyo Check · Price map</title>
+  <meta name="description" content="A map of stores and gas stations marked ₱ budget, ₱₱ typical or ₱₱₱ pricier, based on prices reported by shoppers.">
+  <meta name="theme-color" content="#1f6f43">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f6f43'/%3E%3Ctext x='16' y='22' font-size='17' font-family='Arial' font-weight='700' text-anchor='middle' fill='%23ffd166'%3E%E2%82%B1%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script type="module" src="map.js"></script>
+</head>
+<body data-section="map">
+  <header class="site-header">
+    <div class="wrap">
+      <div class="header-row">
+        <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">₱</span>Presyo<span>Check</span></a>
+        <nav class="tabs" aria-label="Sections">
+          <a class="tab" data-page="index.html" href="index.html">Food &amp; groceries</a>
+          <a class="tab" data-page="gas.html" href="gas.html">Gas prices</a>
+          <a class="tab active" aria-current="page" data-page="map.html" href="map.html">Price map</a>
+        </nav>
+      </div>
+      <p class="tagline">See which places are budget, typical or pricier, based on what shoppers and motorists reported in the last few weeks.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="picker" aria-label="Choose what to show">
+      <label class="field"><span>Show</span>
+        <select id="show">
+          <option value="food">Food &amp; grocery stores</option>
+          <option value="fuel">Gas stations</option>
+        </select>
+      </label>
+      <label class="field"><span>City</span><select id="city" disabled><option>Loading…</option></select></label>
+      <label class="field" id="barangay-field"><span>Barangay</span><select id="barangay" disabled></select></label>
+      <label class="field" id="kind-field"><span>Store type</span><select id="kind"><option value="">All store types</option></select></label>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <div class="headline">
+      <h1 id="title">Price map</h1>
+      <p id="sub" class="muted"></p>
+    </div>
+
+    <div class="map-legend" aria-label="Legend">
+      <span><b class="pin t1" aria-hidden="true">₱</b> Budget: usually more than 5% below the area's typical price</span>
+      <span><b class="pin t2" aria-hidden="true">₱₱</b> Typical: within 5%</span>
+      <span><b class="pin t3" aria-hidden="true">₱₱₱</b> Pricier: usually more than 5% above</span>
+      <span><b class="pin t0" aria-hidden="true">?</b> Not enough prices yet</span>
+    </div>
+
+    <div id="placing" class="placing" hidden role="status" aria-live="polite">
+      <span id="placing-text"></span>
+      <span class="placing-actions">
+        <button class="btn primary" type="button" id="placing-save" disabled>Save this spot</button>
+        <button class="btn" type="button" id="placing-cancel">Cancel</button>
+      </span>
+    </div>
+
+    <div id="map" class="map" role="region" aria-label="Map of stores"></div>
+
+    <h2 id="list-title">Places in this area</h2>
+    <p class="muted small" id="list-note">Places without a pin are listed here too. If you know where one is, tap <b>Place on map</b>, then tap the spot on the map.</p>
+    <div class="table-wrap">
+      <table class="table" id="places">
+        <thead>
+          <tr>
+            <th scope="col">Price level</th>
+            <th scope="col">Place</th>
+            <th scope="col" class="num">vs typical</th>
+            <th scope="col" class="num hide-sm">Prices</th>
+            <th scope="col">On the map</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>How the price level works.</strong> For every product with at least two reported prices in the area, each place's latest price is compared with the middle (median) price there. A place's level is its usual gap across those products, and it needs at least two compared products to get one. Food uses reports from the last 30 days, gas stations the last 14 days. Map pins are placed by visitors; map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> contributors.</p>
+    </div>
+  </footer>
+</body>
+</html>

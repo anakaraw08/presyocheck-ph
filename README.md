@@ -5,6 +5,11 @@ A small website where anyone can compare and report prices store by store, down 
 - **Food & groceries** (`index.html`): palengke, supermarkets, small groceries, convenience stores,
   sari-sari and Kadiwa stores. Official reference: DA Bantay Presyo, SRA sugar monitoring, DTI SRP.
 - **Gas prices** (`gas.html`): gas stations, with this week's DOE-based Metro Manila range per fuel.
+- **Price map** (`map.html`): every store or station as a pin marked ₱ budget, ₱₱ typical or ₱₱₱ pricier.
+  A place's level is its usual gap from the area's middle (median) price across products with at least
+  two reported prices: more than 5% below is ₱, within 5% is ₱₱, more than 5% above is ₱₱₱
+  (`TIER_BAND` and `MIN_COMPARED` in `summary.js`). Visitors pin stores themselves with "Place on map";
+  a pin can be set once per store, inside Metro Manila, up to 20 per connection per day.
 
 Each page is a table with a row per product and a column per store. Stores are sorted from usually
 cheapest to most expensive; tap a product to sort them by that product's price, lowest first. The
@@ -16,6 +21,7 @@ lowest price in each row is green, the highest red. Tap an empty cell to add a p
 |---|---|
 | `index.html` | Food & groceries page and the "Report a price" form |
 | `gas.html` | Gas prices page (same layout, `data-section="fuel"`) |
+| `map.html`, `map.js` | Price map (Leaflet + OpenStreetMap tiles) |
 | `styles.css` | Styling (light and dark mode, phone-friendly) |
 | `app.js` | Loads data from Supabase, draws the comparison table, sends reports (shared by both pages) |
 | `summary.js` | Pure functions: time window, unusual-price filter, price grid, store ranking |
@@ -44,6 +50,8 @@ Visitors can add stores themselves from the report form (name, type, barangay, s
 The starting store list for Parang came from public business directories, so check it on the ground:
 
 ```sql
+-- Fix a wrong map pin (visitors can't move pins once set)
+update stores set lat = 14.6612, lng = 121.1101 where id = '...';
 -- Rename or move a store
 update stores set name = 'Puregold Extra Parang', barangay_id = 'marikina-parang' where id = '...';
 ```

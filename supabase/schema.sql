@@ -213,3 +213,12 @@ alter table public.official_prices add column price_high numeric(10,2) check (pr
 -- recent_reports view: now also returns barangay_id.
 -- Seed data: Marikina's 16 barangays, 11 packaged goods, 6 fuels with this week's NCR ranges,
 -- and 17 Marikina stores and gas stations (10 in Parang); see migration "seed_marikina_parang_and_fuel".
+
+-- ======================================================================
+-- v3 (Nov 4, 2026): store pins for the price map
+-- ======================================================================
+-- cities.lat/lng: approximate centre, for framing the map only.
+-- stores.lat/lng (+ private location_hash, location_set_at), limited to a Metro Manila box.
+-- public.set_store_location(p_store, p_lat, p_lng): SECURITY DEFINER, callable by visitors;
+--   sets a pin only when the store has none, inside Metro Manila, max 20 pins per connection per day.
+-- See migration "store_locations_for_map" for the full SQL.

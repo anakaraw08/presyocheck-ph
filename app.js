@@ -1,6 +1,6 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
-import { KINDS, withinWindow, flagReports, buildMatrix, orderStores } from './summary.js';
+import { KINDS, withinWindow, flagReports, buildMatrix, orderStores, priceTier } from './summary.js';
 
 const db = createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
 
@@ -211,11 +211,13 @@ function render() {
   // Header: one column per store
   const head = el('tr', {}, el('th', { class: 'corner', scope: 'col', text: SECTION === 'fuel' ? 'Fuel' : 'Product' }));
   ordered.forEach((s, i) => {
-    const { score } = matrix.storeScore(s.id);
+    const { score, vsAverage, compared } = matrix.storeScore(s.id);
+    const tier = priceTier(vsAverage, compared);
     const b = brgyById(s.barangay_id);
     const where = [!state.barangay && b ? b.name : null, s.address].filter(Boolean).join(' · ');
     head.append(el('th', { scope: 'col', class: 'store-col', title: s.address || '' },
-      el('span', { class: 'store-name' }, el('span', { class: 'dot ' + s.kind }), s.name),
+      el('span', { class: 'store-name' }, el('span', { class: 'dot ' + s.kind }), s.name,
+        tier ? el('b', { class: 'pin t' + tier, title: ['', 'Budget', 'Typical', 'Pricier'][tier] + ' for this area', text: '₱'.repeat(tier) }) : null),
       el('span', { class: 'store-meta', text: KINDS[s.kind] + (where ? ' · ' + where : '') }),
       score !== null && !state.sortItem
         ? el('span', { class: 'rank' + (i === 0 ? ' top' : ''), text: i === 0 ? 'Usually cheapest' : `About +${Math.round((score - 1) * 100)}% vs lowest` })
@@ -279,7 +281,11 @@ function syncUrl() {
   // Keep the place when switching between the food and gas pages.
   const place = new URLSearchParams({ city: state.city });
   if (state.barangay) place.set('brgy', state.barangay);
-  document.querySelectorAll('.tab[data-page]').forEach((a) => { a.href = a.dataset.page + '?' + place.toString(); });
+  document.querySelectorAll('.tab[data-page]').forEach((a) => {
+    const q = new URLSearchParams(place);
+    if (a.dataset.page === 'map.html') q.set('show', SECTION);
+    a.href = a.dataset.page + '?' + q.toString();
+  });
   try {
     localStorage.setItem('presyo.city', state.city);
     localStorage.setItem('presyo.brgy', state.barangay);

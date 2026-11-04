@@ -266,3 +266,32 @@ dialog p { margin: 0; }
   .official { display: none; }
   .grid tr.sorted .official, .grid .item-col .official:first-of-type { display: block; }
 }
+
+/* ---------- v3: price map ---------- */
+:root { --t1: #1f7a46; --t2: #2f6fbf; --t3: #b3261e; --t0: #8a938e; }
+.pin {
+  display: inline-grid; place-items: center; min-width: 30px; height: 24px; padding: 0 6px;
+  border-radius: 999px; font: 800 .78rem/1 system-ui, sans-serif; letter-spacing: -.02em;
+  color: #fff; background: var(--t0); border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0, 0, 0, .35); white-space: nowrap;
+}
+.pin.t1 { background: var(--t1); }
+.pin.t2 { background: var(--t2); }
+.pin.t3 { background: var(--t3); }
+.pin.draft { background: #fff; border-color: var(--brand); font-size: 1rem; }
+.pin-wrap { background: none; border: 0; }
+.leaflet-marker-icon.pin-wrap { width: auto !important; height: auto !important; }
+
+.map { height: min(62vh, 560px); min-height: 320px; border-radius: var(--radius); border: 1px solid var(--line); box-shadow: var(--shadow); z-index: 0; }
+.map.placing-mode { cursor: crosshair; outline: 3px solid var(--accent); }
+.map.placing-mode .leaflet-grab { cursor: crosshair; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .85rem; color: var(--muted); margin: 0 0 12px; }
+.map-legend .pin { margin-right: 6px; box-shadow: none; }
+.placing { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 10px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--accent) 28%, var(--panel)); border: 1px solid var(--accent); font-weight: 600; }
+.placing-actions { display: flex; gap: 8px; }
+.popup { display: grid; gap: 4px; min-width: 180px; font: 14px/1.4 system-ui, sans-serif; }
+.popup-tier { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
+.popup .pin { box-shadow: none; }
+.small-btn { padding: 6px 10px; font-size: .85rem; white-space: normal; line-height: 1.2; }
+.leaflet-container { font: inherit; background: var(--bg); }
+.leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--panel); color: var(--fg); }
+.store-name .pin { min-width: 0; height: 18px; font-size: .66rem; padding: 0 5px; margin-left: 4px; vertical-align: 1px; box-shadow: none; border-width: 1px; }

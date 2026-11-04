@@ -111,21 +111,27 @@ export function buildMatrix(flagged) {
     row.max = row.priced > 1 ? Math.max(...row.prices) : null;
   }
 
-  const ratios = new Map();
+  for (const row of rows.values()) row.median = row.priced > 1 ? median(row.prices) : null;
+
+  const ratios = new Map();     // price / cheapest in the row
+  const vsMedian = new Map();   // price / middle price in the row
   const pricedCount = new Map();
+  const push = (m, k, v) => { if (!m.has(k)) m.set(k, []); m.get(k).push(v); };
   for (const c of cells.values()) {
     pricedCount.set(c.store_id, (pricedCount.get(c.store_id) || 0) + 1);
     const row = rows.get(c.item_id);
     if (c.suspicious || !row || row.min === null) continue;
-    if (!ratios.has(c.store_id)) ratios.set(c.store_id, []);
-    ratios.get(c.store_id).push(c.price / row.min);
+    push(ratios, c.store_id, c.price / row.min);
+    push(vsMedian, c.store_id, c.price / row.median);
   }
 
   return {
     cell: (itemId, storeId) => cells.get(itemId + '|' + storeId),
-    row: (itemId) => rows.get(itemId) || { min: null, max: null, priced: 0 },
+    row: (itemId) => rows.get(itemId) || { min: null, max: null, median: null, priced: 0 },
     storeScore: (storeId) => ({
       score: ratios.has(storeId) ? median(ratios.get(storeId)) : null,
+      vsAverage: vsMedian.has(storeId) ? median(vsMedian.get(storeId)) : null,
+      compared: vsMedian.has(storeId) ? vsMedian.get(storeId).length : 0,
       priced: pricedCount.get(storeId) || 0,
     }),
   };
@@ -150,6 +156,20 @@ export function orderStores(stores, matrix, byItemId = null) {
     const ka = key(a), kb = key(b);
     return ka[0] - kb[0] || ka[1] - kb[1] || a.name.localeCompare(b.name);
   });
+}
+
+/**
+ * Map tier from storeScore().vsAverage (1.00 = the area's typical price).
+ * Within ±TIER_BAND of typical is ₱₱; below is ₱ (budget), above is ₱₱₱.
+ * A store needs at least MIN_COMPARED compared products to get a tier at all.
+ */
+export const TIER_BAND = 0.05;
+export const MIN_COMPARED = 2;
+export function priceTier(vsAverage, compared) {
+  if (vsAverage === null || compared < MIN_COMPARED) return null;
+  if (vsAverage < 1 - TIER_BAND) return 1;
+  if (vsAverage > 1 + TIER_BAND) return 3;
+  return 2;
 }
 
 /** One row per store: its most recent report and how many reports it has. */
