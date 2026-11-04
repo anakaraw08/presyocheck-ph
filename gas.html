@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Presyo Check · Gas prices by barangay</title>
+  <meta name="description" content="Compare gasoline, diesel and kerosene prices at each gas station near you, beside the DOE Metro Manila range.">
+  <meta name="theme-color" content="#1f6f43">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f6f43'/%3E%3Ctext x='16' y='22' font-size='17' font-family='Arial' font-weight='700' text-anchor='middle' fill='%23ffd166'%3E%E2%82%B1%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="app.js"></script>
+</head>
+<body data-section="fuel">
+  <header class="site-header">
+    <div class="wrap">
+      <div class="header-row">
+        <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">₱</span>Presyo<span>Check</span></a>
+        <nav class="tabs" aria-label="Sections">
+          <a class="tab" data-page="index.html" href="index.html">Food &amp; groceries</a>
+          <a class="tab active" aria-current="page" data-page="gas.html" href="gas.html">Gas prices</a>
+        </nav>
+      </div>
+      <p class="tagline">Compare pump prices station by station in your barangay, reported by motorists and set beside the DOE Metro Manila range for the week.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="picker" aria-label="Choose a location and filter">
+      <label class="field"><span>City</span><select id="city" disabled><option>Loading…</option></select></label>
+      <label class="field" id="barangay-field"><span>Barangay</span><select id="barangay" disabled></select></label>
+            <button id="open-report" class="btn primary" type="button" disabled>Report a price</button>
+    </section>
+
+    <p id="status" class="status" role="status" aria-live="polite"></p>
+
+    <section id="view" hidden>
+      <div class="headline">
+        <h1 id="title"></h1>
+        <p id="sub" class="muted"></p>
+      </div>
+      <div class="sortbar">
+        <span id="sort-label"></span>
+        <button class="link" id="sort-reset" type="button" hidden>Sort by overall cheapest instead</button>
+      </div>
+      <div class="legend small muted">
+        <span><i class="sw best"></i>Lowest in the row</span>
+        <span><i class="sw worst"></i>Highest in the row</span>
+        <span><i class="sw sus"></i>Unusual, not compared</span>
+        <span>Tap a fuel to sort stations by its price · tap an empty cell to add a price</span>
+      </div>
+      <div class="grid-wrap" id="grid-wrap" tabindex="0" aria-label="Price comparison table, scrolls sideways">
+        <table class="grid" id="grid">
+          <thead></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="no-stores" class="empty" hidden>
+        <p>No gas stations are listed here yet.</p>
+        <button class="btn primary" type="button" id="add-first-store">Add a gas station</button>
+      </div>
+    </section>
+
+    <dialog id="report-dialog" aria-labelledby="report-title">
+      <form id="report-form" method="dialog" novalidate>
+        <h2 id="report-title">Report a price in <span id="report-place"></span></h2>
+        <p class="muted small">Tell us what you paid or saw on the price tag. Reports are public and anonymous.</p>
+
+        <label class="field">
+          <span>Gas station</span>
+          <select name="store" id="report-store" required></select>
+        </label>
+
+        <div id="new-store" class="new-store" hidden>
+          <label class="field"><span>Station name and branch</span><input id="store-name" maxlength="80" placeholder="e.g. Petron Bayan-Bayanan"></label>
+          <div class="row">
+            <label class="field"><span>Type</span><select id="store-kind"></select></label>
+            <label class="field" id="store-brgy-field"><span>Barangay</span><select id="store-brgy"></select></label>
+          </div>
+          <label class="field"><span>Street or landmark <small class="muted">(optional)</small></span><input id="store-address" maxlength="120" placeholder="e.g. M.L. Quezon St., near the chapel"></label>
+        </div>
+
+        <label class="field">
+          <span>Fuel</span>
+          <select name="item" id="report-item" required></select>
+        </label>
+
+        <div class="row">
+          <label class="field grow">
+            <span>Price <small id="report-unit" class="muted"></small></span>
+            <span class="money"><span aria-hidden="true">₱</span><input id="report-price" type="number" inputmode="decimal" min="20" max="300" step="0.01" required></span>
+          </label>
+          <label class="field"><span>Date</span><input id="report-date" type="date" required></label>
+        </div>
+
+        <label class="field">
+          <span>Note <small class="muted">(optional)</small></span>
+          <input id="report-note" maxlength="140" placeholder="e.g. with discount card, self-service">
+        </label>
+
+        <p id="report-error" class="error" role="alert"></p>
+        <div class="actions">
+          <button class="btn" type="button" id="report-cancel">Cancel</button>
+          <button class="btn primary" type="submit" id="report-submit">Submit price</button>
+        </div>
+      </form>
+    </dialog>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p><strong>Where the numbers come from.</strong> Station prices are reported by visitors, are not verified, and show the latest report from the last 14 days; pump prices change every Tuesday, so check the date under each price. The official range is the Metro Manila price range for the week, from <a href="https://doe.gov.ph/" rel="noopener">DOE</a> monitoring as reported by the press. Station lists start from public directories: add the ones you know.</p>
+    </div>
+  </footer>
+</body>
+</html>

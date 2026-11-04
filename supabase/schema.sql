@@ -174,3 +174,42 @@ grant select on public.recent_reports to anon, authenticated;
 
 -- Seed data (17 NCR cities, 26 items, official prices, 18 public markets) was
 -- loaded separately; see the project's migration "seed_ncr_reference_data".
+
+-- ======================================================================
+-- v2 (Nov 4, 2026): barangays, more store types, fuel, DOE ranges
+-- ======================================================================
+create table public.barangays (
+  id text primary key,
+  city_id text not null references public.cities(id),
+  name text not null,
+  sort_order int not null default 0
+);
+create index barangays_city_idx on public.barangays (city_id);
+alter table public.barangays enable row level security;
+create policy "Anyone can read barangays" on public.barangays for select to anon, authenticated using (true);
+grant select on public.barangays to anon, authenticated;
+
+alter table public.stores add column barangay_id text references public.barangays(id);
+alter table public.stores add column address text check (address is null or char_length(address) <= 120);
+create index stores_barangay_idx on public.stores (barangay_id);
+alter table public.stores drop constraint stores_kind_check;
+alter table public.stores add constraint stores_kind_check
+  check (kind in ('palengke','supermarket','grocery','convenience','sari_sari','kadiwa','gas_station'));
+drop index public.stores_city_name_kind_key;
+create unique index stores_city_brgy_name_kind_key
+  on public.stores (city_id, coalesce(barangay_id, ''), lower(btrim(name)), kind);
+grant select (id, city_id, barangay_id, name, kind, address, is_seed, created_at) on public.stores to anon, authenticated;
+grant insert (id, city_id, barangay_id, name, kind, address) on public.stores to anon, authenticated;
+
+alter table public.items add column section text not null default 'food' check (section in ('food','fuel'));
+
+alter table public.official_prices drop constraint official_prices_channel_check;
+alter table public.official_prices add constraint official_prices_channel_check
+  check (channel in ('palengke','supermarket','srp','doe'));
+alter table public.official_prices add column price_high numeric(10,2) check (price_high is null or price_high >= price);
+
+-- private.before_store(): now also checks the barangay belongs to the city and tidies the address.
+-- private.before_price_report(): now also refuses fuel prices at non-gas-stations and food prices at gas stations.
+-- recent_reports view: now also returns barangay_id.
+-- Seed data: Marikina's 16 barangays, 11 packaged goods, 6 fuels with this week's NCR ranges,
+-- and 17 Marikina stores and gas stations (10 in Parang); see migration "seed_marikina_parang_and_fuel".

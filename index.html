@@ -3,139 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Presyo Check · Metro Manila market prices</title>
-  <meta name="description" content="Check and share what groceries cost at the palengke, supermarkets and sari-sari stores in your Metro Manila city.">
+  <title>Presyo Check · Food and grocery prices by barangay</title>
+  <meta name="description" content="Compare what groceries cost at each palengke, supermarket, grocery and convenience store in your barangay.">
   <meta name="theme-color" content="#1f6f43">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231f6f43'/%3E%3Ctext x='16' y='22' font-size='17' font-family='Arial' font-weight='700' text-anchor='middle' fill='%23ffd166'%3E%E2%82%B1%3C/text%3E%3C/svg%3E">
   <link rel="stylesheet" href="styles.css">
   <script type="module" src="app.js"></script>
 </head>
-<body>
+<body data-section="food">
   <header class="site-header">
     <div class="wrap">
-      <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">₱</span>Presyo<span>Check</span></a>
-      <p class="tagline">What groceries cost at the palengke, the supermarket and the corner store in your city, reported by shoppers and set beside official prices.</p>
+      <div class="header-row">
+        <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">₱</span>Presyo<span>Check</span></a>
+        <nav class="tabs" aria-label="Sections">
+          <a class="tab active" aria-current="page" data-page="index.html" href="index.html">Food &amp; groceries</a>
+          <a class="tab" data-page="gas.html" href="gas.html">Gas prices</a>
+        </nav>
+      </div>
+      <p class="tagline">Compare prices store by store in your barangay: palengke, supermarkets, small groceries, convenience and sari-sari stores. Reported by shoppers, set beside official prices.</p>
     </div>
   </header>
 
   <main class="wrap">
-    <section class="picker" aria-label="Choose a city and item">
-      <label class="field">
-        <span>City</span>
-        <select id="city" disabled><option>Loading…</option></select>
-      </label>
-      <label class="field">
-        <span>Item</span>
-        <select id="item" disabled><option value="">All items</option></select>
-      </label>
+    <section class="picker" aria-label="Choose a location and filter">
+      <label class="field"><span>City</span><select id="city" disabled><option>Loading…</option></select></label>
+      <label class="field" id="barangay-field"><span>Barangay</span><select id="barangay" disabled></select></label>
+      <label class="field"><span>Products</span><select id="category" disabled><option value="">All products</option></select></label>
+      <label class="field"><span>Store type</span><select id="kind" disabled><option value="">All store types</option></select></label>
       <button id="open-report" class="btn primary" type="button" disabled>Report a price</button>
     </section>
 
     <p id="status" class="status" role="status" aria-live="polite"></p>
 
-    <section id="city-view" hidden>
+    <section id="view" hidden>
       <div class="headline">
-        <h1 id="city-title"></h1>
-        <p id="city-sub" class="muted"></p>
+        <h1 id="title"></h1>
+        <p id="sub" class="muted"></p>
       </div>
-      <div class="table-wrap">
-        <table class="table" id="overview">
-          <thead>
-            <tr>
-              <th scope="col">Item</th>
-              <th scope="col" class="num"><span class="dot palengke"></span>Palengke</th>
-              <th scope="col" class="num"><span class="dot supermarket"></span>Supermarket</th>
-              <th scope="col" class="num hide-sm"><span class="dot sari_sari"></span>Sari-sari</th>
-              <th scope="col" class="num">Official (NCR)</th>
-              <th scope="col" class="num hide-sm">Reports</th>
-            </tr>
-          </thead>
+      <div class="sortbar">
+        <span id="sort-label"></span>
+        <button class="link" id="sort-reset" type="button" hidden>Sort by overall cheapest instead</button>
+      </div>
+      <div class="legend small muted">
+        <span><i class="sw best"></i>Lowest in the row</span>
+        <span><i class="sw worst"></i>Highest in the row</span>
+        <span><i class="sw sus"></i>Unusual, not compared</span>
+        <span>Tap a product to sort stores by its price · tap an empty cell to add a price</span>
+      </div>
+      <div class="grid-wrap" id="grid-wrap" tabindex="0" aria-label="Price comparison table, scrolls sideways">
+        <table class="grid" id="grid">
+          <thead></thead>
           <tbody></tbody>
         </table>
       </div>
-      <p class="muted small">Community prices are the median of shopper reports from the last 30 days. Tap an item for every store's latest price.</p>
-    </section>
-
-    <section id="item-view" hidden>
-      <div class="headline">
-        <button class="link back" id="back" type="button">← All items</button>
-        <h1 id="item-title"></h1>
-        <p id="item-sub" class="muted"></p>
-      </div>
-      <div id="official" class="official"></div>
-      <div id="kinds" class="kinds"></div>
-      <div id="empty" class="empty" hidden>
-        <p>No one has reported this item in <strong id="empty-city"></strong> in the last 30 days.</p>
-        <button class="btn primary" type="button" id="empty-report">Be the first to report it</button>
-      </div>
-      <div id="stores-block" hidden>
-        <h2>Latest price at each store</h2>
-        <div class="table-wrap">
-          <table class="table" id="stores">
-            <thead>
-              <tr>
-                <th scope="col">Store</th>
-                <th scope="col" class="num">Latest price</th>
-                <th scope="col" class="num">vs official</th>
-                <th scope="col" class="hide-sm">Reported</th>
-                <th scope="col" class="num hide-sm">Reports</th>
-              </tr>
-            </thead>
-            <tbody></tbody>
-          </table>
-        </div>
+      <div id="no-stores" class="empty" hidden>
+        <p>No stores are listed here yet.</p>
+        <button class="btn primary" type="button" id="add-first-store">Add a store</button>
       </div>
     </section>
 
     <dialog id="report-dialog" aria-labelledby="report-title">
       <form id="report-form" method="dialog" novalidate>
-        <h2 id="report-title">Report a price in <span id="report-city"></span></h2>
+        <h2 id="report-title">Report a price in <span id="report-place"></span></h2>
         <p class="muted small">Tell us what you paid or saw on the price tag. Reports are public and anonymous.</p>
 
         <label class="field">
-          <span>Store or market</span>
+          <span>Store</span>
           <select name="store" id="report-store" required></select>
         </label>
 
         <div id="new-store" class="new-store" hidden>
-          <label class="field">
-            <span>Store name</span>
-            <input name="store_name" id="store-name" maxlength="80" placeholder="e.g. SM Supermarket Marikina">
-          </label>
-          <label class="field">
-            <span>Type</span>
-            <select name="store_kind" id="store-kind">
-              <option value="palengke">Palengke (public market)</option>
-              <option value="supermarket">Supermarket or grocery</option>
-              <option value="sari_sari">Sari-sari store</option>
-              <option value="kadiwa">Kadiwa store</option>
-            </select>
-          </label>
+          <label class="field"><span>Store name and branch</span><input id="store-name" maxlength="80" placeholder="e.g. Alfamart Parang"></label>
+          <div class="row">
+            <label class="field"><span>Type</span><select id="store-kind"></select></label>
+            <label class="field" id="store-brgy-field"><span>Barangay</span><select id="store-brgy"></select></label>
+          </div>
+          <label class="field"><span>Street or landmark <small class="muted">(optional)</small></span><input id="store-address" maxlength="120" placeholder="e.g. M.L. Quezon St., near the chapel"></label>
         </div>
 
         <label class="field">
-          <span>Item</span>
+          <span>Product</span>
           <select name="item" id="report-item" required></select>
         </label>
 
         <div class="row">
           <label class="field grow">
             <span>Price <small id="report-unit" class="muted"></small></span>
-            <span class="money"><span aria-hidden="true">₱</span><input name="price" id="report-price" type="number" inputmode="decimal" min="0.25" max="5000" step="0.25" required></span>
+            <span class="money"><span aria-hidden="true">₱</span><input id="report-price" type="number" inputmode="decimal" min="0.25" max="5000" step="0.05" required></span>
           </label>
-          <label class="field">
-            <span>Date</span>
-            <input name="observed_on" id="report-date" type="date" required>
-          </label>
+          <label class="field"><span>Date</span><input id="report-date" type="date" required></label>
         </div>
 
         <label class="field">
           <span>Note <small class="muted">(optional)</small></span>
-          <input name="note" id="report-note" maxlength="140" placeholder="e.g. per tumpok, sale price, imported">
+          <input id="report-note" maxlength="140" placeholder="e.g. brand, sale price, per tumpok">
         </label>
 
         <p id="report-error" class="error" role="alert"></p>
-
         <div class="actions">
           <button class="btn" type="button" id="report-cancel">Cancel</button>
           <button class="btn primary" type="submit" id="report-submit">Submit price</button>
@@ -146,7 +110,7 @@
 
   <footer class="site-footer">
     <div class="wrap">
-      <p><strong>Where the numbers come from.</strong> Community prices are reported by visitors and are not verified; unusual entries are left out of the medians. Official prices: <a href="https://www.da.gov.ph/price-monitoring/" rel="noopener">DA Bantay Presyo</a> prevailing wet market prices for NCR, <a href="https://www.sra.gov.ph/" rel="noopener">SRA</a> weekly sugar monitoring, and <a href="https://dti.gov.ph/epresyo" rel="noopener">DTI</a> suggested retail prices.</p>
+      <p><strong>Where the numbers come from.</strong> Store prices are reported by visitors, are not verified, and show the latest report from the last 30 days; unusual entries are not compared. Store lists start from public business directories, so some may have moved or closed: add the ones you know. Official prices: <a href="https://www.da.gov.ph/price-monitoring/" rel="noopener">DA Bantay Presyo</a> NCR wet market prices, <a href="https://www.sra.gov.ph/" rel="noopener">SRA</a> sugar monitoring and <a href="https://dti.gov.ph/epresyo" rel="noopener">DTI</a> suggested retail prices.</p>
     </div>
   </footer>
 </body>
