@@ -222,3 +222,8 @@ alter table public.official_prices add column price_high numeric(10,2) check (pr
 -- public.set_store_location(p_store, p_lat, p_lng): SECURITY DEFINER, callable by visitors;
 --   sets a pin only when the store has none, inside Metro Manila, max 20 pins per connection per day.
 -- See migration "store_locations_for_map" for the full SQL.
+
+-- v4: OpenStreetMap import (applied as migrations osm_import_setup, osm_import_function, osm_import_fix_branch, osm_import_tidy_parang)
+-- extensions http + postgis (schema extensions); stores.source ('community'|'seed'|'osm'|'bplo'), stores.osm_ref (unique), stores.osm_synced_at
+-- private.osm_features, private.osm_barangays (staging), private.overpass(q), private.norm(t)
+-- select private.osm_import('<city id>', '<OSM city name>');   -- re-runnable; see README

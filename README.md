@@ -48,7 +48,26 @@ insert into barangays (id, city_id, name, sort_order) values
 ```
 
 Visitors can add stores themselves from the report form (name, type, barangay, street).
-The starting store list for Parang came from public business directories, so check it on the ground:
+
+### Importing stores from OpenStreetMap
+
+Supermarkets, groceries, convenience stores, markets and gas stations come from OpenStreetMap,
+with their map pins, street and barangay (worked out from OSM's barangay boundaries). Run the
+import from the SQL editor; running it again updates what's there and adds new places without
+duplicating:
+
+```sql
+select private.osm_import('marikina', 'Marikina');   -- city id here, city name as OSM spells it
+```
+
+It links OSM places to stores already listed when the name matches, or when exactly one store of
+the same brand and type is in that barangay, and only fills a pin or street that's empty. Places
+with no name in OSM are skipped. Rows it added have `source = 'osm'` and an `osm_ref` such as
+`node/123`. Other cities need their barangays in the `barangays` table first. The data is under the
+ODbL licence, so keep the "OpenStreetMap contributors" credit in the page footers. Fixes are best
+made on openstreetmap.org itself, so they reach everyone and come back on the next import.
+
+The seeded stores came from public business directories, so check them on the ground:
 
 ```sql
 -- Fix a wrong map pin (visitors can't move pins once set)
