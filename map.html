@@ -13,6 +13,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script type="module" src="ads.js"></script>
   <script type="module" src="map.js"></script>
 </head>
 <body data-section="map">
@@ -45,6 +46,8 @@
 
     <p id="status" class="status" role="status" aria-live="polite"></p>
 
+    <aside data-ad="top"></aside>
+
     <div class="headline">
       <h1 id="title">Price map</h1>
       <p id="sub" class="muted"></p>
@@ -67,6 +70,8 @@
 
     <div id="map" class="map" role="region" aria-label="Map of stores"></div>
 
+    <aside data-ad="bottom"></aside>
+
     <h2 id="list-title">Places in this area</h2>
     <p class="muted small" id="list-note">Places without a pin are listed here too. If you know where one is, tap <b>Place on map</b>, then tap the spot on the map.</p>
     <div class="table-wrap">
@@ -88,6 +93,7 @@
   <footer class="site-footer">
     <div class="wrap">
       <p><strong>How the price level works.</strong> For every product with at least two reported prices in the area, each place's latest price is compared with the middle (median) price there. A place's level is its usual gap across those products, and it needs at least two compared products to get one. Food uses reports from the last 30 days, gas stations the last 14 days. Map pins are placed by visitors; map data © <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a> contributors.</p>
+      <p id="advertise" class="advertise"><strong>Advertise here.</strong> Reach shoppers and motorists checking prices in their barangay. Contact: [YOUR EMAIL OR PAGE]</p>
     </div>
   </footer>
 </body>

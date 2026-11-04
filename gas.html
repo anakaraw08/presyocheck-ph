@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script type="module" src="ads.js"></script>
   <script type="module" src="app.js"></script>
 </head>
 <body data-section="fuel">
@@ -37,6 +38,8 @@
 
     <p id="status" class="status" role="status" aria-live="polite"></p>
 
+    <aside data-ad="top"></aside>
+
     <section id="view" hidden>
       <div class="headline">
         <h1 id="title"></h1>
@@ -62,6 +65,7 @@
         <p>No gas stations are listed here yet.</p>
         <button class="btn primary" type="button" id="add-first-store">Add a gas station</button>
       </div>
+      <aside data-ad="bottom"></aside>
     </section>
 
     <dialog id="report-dialog" aria-labelledby="report-title">
@@ -113,6 +117,7 @@
   <footer class="site-footer">
     <div class="wrap">
       <p><strong>Where the numbers come from.</strong> Station prices are reported by visitors, are not verified, and show the latest report from the last 14 days; pump prices change every Tuesday, so check the date under each price. The official range is the Metro Manila price range for the week, from <a href="https://doe.gov.ph/" rel="noopener">DOE</a> monitoring as reported by the press. Station lists start from public directories: add the ones you know.</p>
+      <p id="advertise" class="advertise"><strong>Advertise here.</strong> Reach shoppers and motorists checking prices in their barangay. Contact: [YOUR EMAIL OR PAGE]</p>
     </div>
   </footer>
 </body>

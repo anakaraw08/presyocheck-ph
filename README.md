@@ -25,6 +25,7 @@ lowest price in each row is green, the highest red. Tap an empty cell to add a p
 | `styles.css` | Styling (light and dark mode, phone-friendly) |
 | `app.js` | Loads data from Supabase, draws the comparison table, sends reports (shared by both pages) |
 | `summary.js` | Pure functions: time window, unusual-price filter, price grid, store ranking |
+| `ads.js` | Ad slots and the pop-up ad (edit `AD_CONFIG` to add real ads) |
 | `config.js` | Supabase project URL and publishable key |
 | `supabase/schema.sql` | The database: tables, security rules, anti-spam limits |
 
@@ -55,6 +56,15 @@ update stores set lat = 14.6612, lng = 121.1101 where id = '...';
 -- Rename or move a store
 update stores set name = 'Puregold Extra Parang', barangay_id = 'marikina-parang' where id = '...';
 ```
+
+## Ads
+
+Each page has two banner slots (`<aside data-ad="top">`, `<aside data-ad="bottom">`) and a pop-up ad
+shown shortly after the page opens. The pop-up closes with ✕, Esc or a tap outside it, and is shown
+once per browser session (`onceEvery: 'load'` shows it on every page load). Tapping any ad follows
+its `href`. All of them are placeholders until you set `image` and `href` in `AD_CONFIG` in `ads.js`;
+external links open in a new tab marked `rel="sponsored"`. Put your contact in the footer's
+"Advertise here" line (`[YOUR EMAIL OR PAGE]` in each page).
 
 ## Run it on your computer
 

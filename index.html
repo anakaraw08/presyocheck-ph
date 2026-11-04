@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script type="module" src="ads.js"></script>
   <script type="module" src="app.js"></script>
 </head>
 <body data-section="food">
@@ -39,6 +40,8 @@
 
     <p id="status" class="status" role="status" aria-live="polite"></p>
 
+    <aside data-ad="top"></aside>
+
     <section id="view" hidden>
       <div class="headline">
         <h1 id="title"></h1>
@@ -64,6 +67,7 @@
         <p>No stores are listed here yet.</p>
         <button class="btn primary" type="button" id="add-first-store">Add a store</button>
       </div>
+      <aside data-ad="bottom"></aside>
     </section>
 
     <dialog id="report-dialog" aria-labelledby="report-title">
@@ -115,6 +119,7 @@
   <footer class="site-footer">
     <div class="wrap">
       <p><strong>Where the numbers come from.</strong> Store prices are reported by visitors, are not verified, and show the latest report from the last 30 days; unusual entries are not compared. Store lists start from public business directories, so some may have moved or closed: add the ones you know. Official prices: <a href="https://www.da.gov.ph/price-monitoring/" rel="noopener">DA Bantay Presyo</a> NCR wet market prices, <a href="https://www.sra.gov.ph/" rel="noopener">SRA</a> sugar monitoring and <a href="https://dti.gov.ph/epresyo" rel="noopener">DTI</a> suggested retail prices.</p>
+      <p id="advertise" class="advertise"><strong>Advertise here.</strong> Reach shoppers and motorists checking prices in their barangay. Contact: [YOUR EMAIL OR PAGE]</p>
     </div>
   </footer>
 </body>

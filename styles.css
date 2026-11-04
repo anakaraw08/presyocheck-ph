@@ -447,3 +447,44 @@ main.wrap {
   border-bottom: 1px solid var(--gold);
   pointer-events: none;
 }
+
+/* ---------- Ads ---------- */
+.ad-slot { display: grid; gap: 4px; justify-items: center; margin: 16px auto; max-width: 728px; }
+.ad-label { font-size: .68rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); background: color-mix(in srgb, var(--bg) 85%, transparent); padding: 0 6px; border-radius: 4px; }
+.ad-link { display: block; width: 100%; text-decoration: none; color: inherit; border-radius: 10px; }
+.ad-link:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }
+.ad-img { display: block; width: 100%; height: auto; border-radius: 10px; border: 1.5px solid var(--gold); }
+.ad-ph {
+  display: grid; place-content: center; justify-items: center; gap: 2px; text-align: center;
+  min-height: 90px; padding: 10px 16px; border-radius: 10px;
+  background: repeating-linear-gradient(135deg, var(--panel) 0 14px, var(--gold-soft) 14px 28px);
+  border: 1.5px dashed var(--gold); color: var(--fg);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.ad-link:hover .ad-ph { transform: translateY(-1px); box-shadow: var(--shadow); }
+.ad-ph-title { font-weight: 700; font-size: 1.05rem; color: var(--brand); }
+.ad-ph-text { font-size: .85rem; color: var(--muted); }
+.ad-ph-size { font-size: .7rem; color: var(--muted); font-variant-numeric: tabular-nums; margin-top: 2px; }
+@media (max-width: 640px) { .ad-slot { max-width: 320px; } .ad-ph { min-height: 100px; } }
+
+.ad-popup {
+  width: min(340px, calc(100vw - 32px)); padding: 0; border: 1.5px solid var(--gold); border-radius: 14px;
+  background: var(--panel); color: var(--fg); box-shadow: 0 24px 60px rgba(0, 20, 60, .35);
+}
+.ad-popup::backdrop { background: rgba(0, 20, 60, .45); }
+.ad-popup-bar { display: flex; align-items: center; justify-content: space-between; padding: 6px 6px 6px 12px; border-bottom: 1px solid var(--line); }
+.ad-close {
+  width: 36px; height: 36px; border-radius: 999px; border: 1px solid var(--gold); background: var(--panel);
+  color: var(--fg); font-size: 1rem; line-height: 1; cursor: pointer;
+}
+.ad-close:hover { background: var(--gold-soft); }
+.ad-close:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+.ad-popup .ad-link { padding: 12px; border-radius: 0 0 14px 14px; }
+.ad-ph.big { min-height: 250px; gap: 8px; padding: 20px; }
+.ad-ph.big .ad-ph-title { font-size: 1.4rem; }
+.ad-cta { margin-top: 6px; pointer-events: none; }
+.advertise { margin-top: 10px; }
+@media (prefers-reduced-motion: no-preference) {
+  .ad-popup[open] { animation: ad-in .22s ease-out; }
+  @keyframes ad-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
+}
