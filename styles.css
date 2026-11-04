@@ -407,20 +407,18 @@ h2 { font-weight: 700; letter-spacing: -.01em; }
 /* ---------- Banig background (original woven-mat pattern) ---------- */
 :root {
   --banig-weave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E %3Crect width='32' height='32' fill='%23f5ecd4'/%3E %3Cpath d='M16 0L32 16L16 32L0 16Z' fill='%23efe4c6'/%3E %3Cpath d='M8 8L16 0L24 8L16 16Z M8 24L16 16L24 24L16 32Z' fill='%23e7d8b0' opacity='.55'/%3E %3Cpath d='M0 16L16 0M16 32L32 16M0 0L32 32M-8 8L8 -8M24 40L40 24M0 32L32 0' stroke='%23dfcd9c' stroke-width='.7' fill='none'/%3E %3Cpath d='M4 12L12 4M20 28L28 20M4 20L12 28M20 4L28 12' stroke='%23dfcd9c' stroke-width='.45' fill='none' opacity='.8'/%3E %3C/svg%3E");
-  --banig-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E %3Cg opacity='.20'%3E %3Cpath d='M80 52L108 80L80 108L52 80Z' fill='none' stroke='%230038a8' stroke-width='6'/%3E %3Cpath d='M80 66L94 80L80 94L66 80Z' fill='%23ce1126'/%3E %3Cpath d='M80 74L86 80L80 86L74 80Z' fill='%23b8860b'/%3E %3Cpath d='M0 0L12 12L0 24M160 0L148 12L160 24M0 160L12 148L0 136M160 160L148 148L160 136' fill='none' stroke='%23b8860b' stroke-width='5'/%3E %3Cpath d='M28 80L40 68L52 80L40 92Z M108 80L120 68L132 80L120 92Z M80 28L92 40L80 52L68 40Z M80 108L92 120L80 132L68 120Z' fill='none' stroke='%23b8860b' stroke-width='3'/%3E %3C/g%3E %3C/svg%3E");
   --banig-base: #f5ecd4;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --banig-weave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E %3Crect width='32' height='32' fill='%230d1324'/%3E %3Cpath d='M16 0L32 16L16 32L0 16Z' fill='%23121a30'/%3E %3Cpath d='M8 8L16 0L24 8L16 16Z M8 24L16 16L24 24L16 32Z' fill='%2318213b' opacity='.55'/%3E %3Cpath d='M0 16L16 0M16 32L32 16M0 0L32 32M-8 8L8 -8M24 40L40 24M0 32L32 0' stroke='%23232d4d' stroke-width='.7' fill='none'/%3E %3Cpath d='M4 12L12 4M20 28L28 20M4 20L12 28M20 4L28 12' stroke='%23232d4d' stroke-width='.45' fill='none' opacity='.8'/%3E %3C/svg%3E");
-    --banig-motif: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E %3Cg opacity='.22'%3E %3Cpath d='M80 52L108 80L80 108L52 80Z' fill='none' stroke='%234f7dff' stroke-width='6'/%3E %3Cpath d='M80 66L94 80L80 94L66 80Z' fill='%23ef4444'/%3E %3Cpath d='M80 74L86 80L80 86L74 80Z' fill='%23d4af37'/%3E %3Cpath d='M0 0L12 12L0 24M160 0L148 12L160 24M0 160L12 148L0 136M160 160L148 148L160 136' fill='none' stroke='%23d4af37' stroke-width='5'/%3E %3Cpath d='M28 80L40 68L52 80L40 92Z M108 80L120 68L132 80L120 92Z M80 28L92 40L80 52L68 40Z M80 108L92 120L80 132L68 120Z' fill='none' stroke='%23d4af37' stroke-width='3'/%3E %3C/g%3E %3C/svg%3E");
     --banig-base: #0d1324;
   }
 }
 body {
   background-color: var(--banig-base);
-  background-image: var(--banig-motif), var(--banig-weave);
-  background-size: 160px 160px, 32px 32px;
+  background-image: var(--banig-weave);
+  background-size: 32px 32px;
 }
 /* A soft veil keeps text on the pattern readable */
 main.wrap {
