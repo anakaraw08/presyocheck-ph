@@ -295,3 +295,111 @@ dialog p { margin: 0; }
 .leaflet-container { font: inherit; background: var(--bg); }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--panel); color: var(--fg); }
 .store-name .pin { min-width: 0; height: 18px; font-size: .66rem; padding: 0 5px; margin-left: 4px; vertical-align: 1px; box-shadow: none; border-width: 1px; }
+
+/* ======================================================================
+   Theme: "PH official" — from the PH Politician Ratings design
+   (Inter, white/zinc neutrals, blue accent), with gold outlines and a
+   Philippine-flag blue top bar.
+   ====================================================================== */
+:root {
+  --bg: #fafafa;
+  --panel: #ffffff;
+  --fg: #18181b;
+  --muted: #52525b;
+  --line: #ecdfb4;          /* inner dividers: soft gold */
+  --gold: #b8860b;          /* outlines: dark goldenrod, 3.3:1 on white */
+  --gold-soft: #f6efd6;
+  --sun: #fcd116;           /* PH flag sun, used on the blue bar */
+  --ph-blue: #0038a8;       /* PH flag blue */
+  --ph-blue-deep: #002a80;
+  --brand: #0038a8;
+  --brand-ink: #ffffff;
+  --accent: #fcd116;
+  --good: #15803d;
+  --bad: #b91c1c;
+  --radius: 12px;
+  --shadow: 0 1px 2px rgba(24, 24, 27, .06), 0 6px 20px rgba(184, 134, 11, .08);
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0b1020;
+    --panel: #121a2e;
+    --fg: #f4f4f5;
+    --muted: #a1a1aa;
+    --line: #3a3420;
+    --gold: #d4af37;
+    --gold-soft: #2a2413;
+    --ph-blue: #0038a8;
+    --ph-blue-deep: #00256f;
+    --brand: #4f7dff;
+    --good: #4ade80;
+    --bad: #f87171;
+    --shadow: none;
+  }
+}
+
+body { font-family: var(--font); font-feature-settings: "cv11", "ss01"; }
+.pin, .popup { font-family: var(--font); }
+
+/* Top bar: PH blue with a gold rule */
+.site-header {
+  background: var(--ph-blue);
+  color: #fff;
+  border-bottom: 3px solid var(--sun);
+}
+.brand span:last-child { color: var(--sun); }
+.brand-mark { background: var(--sun); color: var(--ph-blue); border: 1px solid rgba(255, 255, 255, .5); }
+.tabs { background: rgba(255, 255, 255, .1); border: 1px solid rgba(252, 209, 22, .55); }
+.tab { opacity: .9; }
+.tab:hover { opacity: 1; background: rgba(255, 255, 255, .08); }
+.tab.active { background: var(--sun); color: #0b1b4d; }
+
+/* Gold outlines on every container and control */
+.picker, .table-wrap, .grid-wrap, .map, .empty, .new-store, .kind {
+  border: 1.5px solid var(--gold);
+}
+.empty { border-style: dashed; }
+dialog { border: 1.5px solid var(--gold); }
+dialog::backdrop { background: rgba(0, 20, 60, .55); }
+select, input {
+  border: 1px solid var(--gold);
+  background: var(--panel);
+}
+select:hover, input:hover { border-color: color-mix(in srgb, var(--gold) 70%, var(--fg)); }
+select:focus, input:focus, .btn:focus-visible, .link:focus-visible,
+.item-btn:focus-visible, .cell-btn:focus-visible, .add:focus-visible, .grid-wrap:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+.btn { border: 1px solid var(--gold); background: var(--panel); }
+.btn:hover:not(:disabled) { background: var(--gold-soft); }
+.btn.primary { background: var(--brand); border-color: var(--gold); color: #fff; box-shadow: inset 0 0 0 1px rgba(252, 209, 22, .35); }
+.btn.primary:hover:not(:disabled) { background: var(--ph-blue-deep); }
+.link { color: var(--brand); font-weight: 600; }
+
+/* Comparison grid: gold header rule, soft-gold dividers */
+.grid thead th { border-bottom: 1.5px solid var(--gold); background: var(--panel); }
+.grid .corner { border-right: 1.5px solid var(--gold); }
+.grid .item-col, .grid tr.cat .cat-label { border-right: 1.5px solid var(--gold); }
+.grid tr.cat .cat-label, .grid tr.cat td, .table .cat td { background: var(--gold-soft); color: #7a5a06; }
+.add { color: color-mix(in srgb, var(--gold) 55%, transparent); }
+.add:hover { color: var(--brand); background: color-mix(in srgb, var(--brand) 6%, transparent); }
+.table th { border-bottom: 1.5px solid var(--gold); }
+.rank.top, .status.ok { color: var(--good); }
+
+/* Headings like the ratings site */
+.headline h1 { font-size: 1.85rem; font-weight: 700; letter-spacing: -.02em; }
+h2 { font-weight: 700; letter-spacing: -.01em; }
+.field > span { color: var(--muted); font-size: .8rem; letter-spacing: .02em; }
+
+/* Map */
+.map.placing-mode { outline: 3px solid var(--sun); }
+.placing { background: var(--gold-soft); border: 1.5px solid var(--gold); }
+.leaflet-popup-content-wrapper { border: 1.5px solid var(--gold); }
+.site-footer { border-top: 1.5px solid var(--gold); }
+
+@media (prefers-color-scheme: dark) {
+  .grid tr.cat .cat-label, .grid tr.cat td, .table .cat td { color: #e9c96a; }
+  .tab.active { color: #0b1b4d; }
+}
