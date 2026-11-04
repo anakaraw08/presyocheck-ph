@@ -227,3 +227,4 @@ alter table public.official_prices add column price_high numeric(10,2) check (pr
 -- extensions http + postgis (schema extensions); stores.source ('community'|'seed'|'osm'|'bplo'), stores.osm_ref (unique), stores.osm_synced_at
 -- private.osm_features, private.osm_barangays (staging), private.overpass(q), private.norm(t)
 -- select private.osm_import('<city id>', '<OSM city name>');   -- re-runnable; see README
+-- v5: public.add_store_at(city, name, kind, lat, lng, address) adds a pinned place; barangay from private.barangay_at() (OSM shapes); near-duplicates within 60 m return the existing place

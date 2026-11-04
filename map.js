@@ -125,7 +125,10 @@ function initMap() {
       draft = L.marker(e.latlng, { draggable: true, icon: pinIcon(0, true), keyboard: false }).addTo(map);
     }
     $('placing-save').disabled = false;
-    $('placing-text').textContent = `Drag the pin if needed, then save the spot for ${state.placing.name}.`;
+    $('placing-text').textContent = state.placing.isNew
+      ? 'Drag the pin if needed, fill in the name and type, then save.'
+      : `Drag the pin if needed, then save the spot for ${state.placing.name}.`;
+    if (state.placing.isNew && !$('np-name').value) $('np-name').focus();
   });
 }
 
@@ -195,7 +198,7 @@ function render() {
     });
   $('places').tBodies[0].replaceChildren(...rows);
   if (!rows.length) {
-    $('places').tBodies[0].replaceChildren(el('tr', {}, el('td', { colspan: '5', class: 'muted', text: `No ${conf.noun} listed here yet. Add one from the ${state.show === 'fuel' ? 'Gas prices' : 'Food & groceries'} page.` })));
+    $('places').tBodies[0].replaceChildren(el('tr', {}, el('td', { colspan: '5', class: 'muted', text: `No ${conf.noun} listed here yet. Tap “+ Add a place” and tap the map where one is.` })));
   }
 }
 
@@ -205,8 +208,9 @@ function startPlacing(store) {
   map.closePopup();
   state.placing = store;
   $('placing').hidden = false;
+  $('new-place').hidden = !store.isNew;
   $('placing-save').disabled = true;
-  $('placing-text').textContent = `Tap the map where ${store.name} is.`;
+  $('placing-text').textContent = store.isNew ? 'Tap the map where the place is.' : `Tap the map where ${store.name} is.`;
   $('map').classList.add('placing-mode');
   window.scrollTo({ top: $('placing').offsetTop - 80, behavior: 'smooth' });
 }
@@ -218,9 +222,58 @@ function stopPlacing() {
   $('map').classList.remove('placing-mode');
 }
 
+function startAdding() {
+  const kinds = SECTIONS[state.show].kinds;
+  $('np-kind').replaceChildren(...kinds.map((k) => el('option', { value: k, text: KINDS[k] })));
+  $('np-kind').value = state.kind || kinds[0];
+  $('np-name').value = '';
+  $('np-address').value = '';
+  startPlacing({ isNew: true });
+}
+
+async function saveNewPlace(lat, lng) {
+  const name = $('np-name').value.trim();
+  if (name.length < 2) {
+    $('placing-text').textContent = 'Please type the place’s name first.';
+    $('np-name').focus();
+    return;
+  }
+  const btn = $('placing-save');
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  const { data, error } = await db.rpc('add_store_at', {
+    p_city: state.city, p_name: name, p_kind: $('np-kind').value,
+    p_lat: lat, p_lng: lng, p_address: $('np-address').value.trim() || null,
+  });
+  btn.textContent = 'Save this spot';
+  if (error) {
+    btn.disabled = false;
+    $('placing-text').textContent = error.message;
+    return;
+  }
+  stopPlacing();
+  await loadCity(state.city);
+  render();
+  const brgy = brgyById(data.barangay_id);
+  const page = state.show === 'fuel' ? 'gas.html' : 'index.html';
+  const q = new URLSearchParams({ city: state.city });
+  if (data.barangay_id) q.set('brgy', data.barangay_id);
+  $('status').className = 'status ok';
+  $('status').replaceChildren(
+    data.existing
+      ? `${data.name} is already on the map there, so nothing new was added. `
+      : `Salamat! ${data.name} is on the map${brgy ? ` in ${brgy.name}` : ''}. `,
+    el('a', { href: `${page}?${q}`, text: 'Add its prices →' }));
+  if (data.existing) {
+    const s = state.stores.find((x) => x.id === data.id);
+    if (s?.lat != null) map.setView([s.lat, s.lng], 18);
+  }
+}
+
 async function savePlacing() {
   if (!state.placing || !draft) return;
   const { lat, lng } = draft.getLatLng();
+  if (state.placing.isNew) return saveNewPlace(lat, lng);
   const btn = $('placing-save');
   btn.disabled = true;
   btn.textContent = 'Saving…';
@@ -337,6 +390,7 @@ async function init() {
   $('barangay').addEventListener('change', (e) => update('barangay', e.target.value));
   $('kind').addEventListener('change', (e) => update('kind', e.target.value));
   $('placing-cancel').addEventListener('click', stopPlacing);
+  $('add-place').addEventListener('click', startAdding);
   $('placing-save').addEventListener('click', savePlacing);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && state.placing) stopPlacing(); });
 

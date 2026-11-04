@@ -47,7 +47,15 @@ insert into barangays (id, city_id, name, sort_order) values
 ('pasig-kapitolyo', 'pasig', 'Kapitolyo', 1);
 ```
 
-Visitors can add stores themselves from the report form (name, type, barangay, street).
+Visitors can add stores themselves two ways:
+
+- **On the price map**, with "+ Add a place": tap the spot, type the name and pick the type. The barangay
+  is worked out from where they tapped (`public.add_store_at`, using OSM barangay boundaries). A tap
+  within about 60 m of a listed place of the same type and a similar name returns that place instead
+  of adding a copy, and spots outside the chosen city are refused.
+- **From the report form** on the Food and Gas pages (name, type, barangay, street, no pin).
+
+Both count toward the limit of 10 new places per connection per day.
 
 ### Importing stores from OpenStreetMap
 

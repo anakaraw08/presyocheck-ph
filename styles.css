@@ -288,6 +288,9 @@ dialog p { margin: 0; }
 .map-legend .pin { margin-right: 6px; box-shadow: none; }
 .placing { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; margin-bottom: 10px; padding: 10px 14px; border-radius: 10px; background: color-mix(in srgb, var(--accent) 28%, var(--panel)); border: 1px solid var(--accent); font-weight: 600; }
 .placing-actions { display: flex; gap: 8px; }
+.add-place-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 10px; }
+.new-place { flex: 1 1 100%; display: grid; grid-template-columns: 2fr 1fr 2fr; gap: 8px 10px; font-weight: 400; }
+@media (max-width: 640px) { .new-place { grid-template-columns: 1fr; } }
 .popup { display: grid; gap: 4px; min-width: 180px; font: 14px/1.4 system-ui, sans-serif; }
 .popup-tier { display: flex; align-items: center; gap: 4px; margin-top: 4px; }
 .popup .pin { box-shadow: none; }

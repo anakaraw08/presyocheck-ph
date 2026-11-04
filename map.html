@@ -60,8 +60,18 @@
       <span><b class="pin t0" aria-hidden="true">?</b> Not enough prices yet</span>
     </div>
 
+    <div class="add-place-row">
+      <button class="btn primary" type="button" id="add-place">+ Add a place</button>
+      <span class="muted small">Missing a palengke, talipapa, store or gas station? Tap the button, then tap where it is on the map.</span>
+    </div>
+
     <div id="placing" class="placing" hidden role="status" aria-live="polite">
       <span id="placing-text"></span>
+      <div id="new-place" class="new-place" hidden>
+        <label class="field"><span>Name</span><input id="np-name" maxlength="80" placeholder="e.g. Talipapa sa Kanto, Petron Sumulong"></label>
+        <label class="field"><span>Type</span><select id="np-kind"></select></label>
+        <label class="field"><span>Street or landmark <small class="muted">(optional)</small></span><input id="np-address" maxlength="120" placeholder="e.g. near the chapel"></label>
+      </div>
       <span class="placing-actions">
         <button class="btn primary" type="button" id="placing-save" disabled>Save this spot</button>
         <button class="btn" type="button" id="placing-cancel">Cancel</button>
