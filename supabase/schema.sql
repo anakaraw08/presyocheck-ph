@@ -228,3 +228,4 @@ alter table public.official_prices add column price_high numeric(10,2) check (pr
 -- private.osm_features, private.osm_barangays (staging), private.overpass(q), private.norm(t)
 -- select private.osm_import('<city id>', '<OSM city name>');   -- re-runnable; see README
 -- v5: public.add_store_at(city, name, kind, lat, lng, address) adds a pinned place; barangay from private.barangay_at() (OSM shapes); near-duplicates within 60 m return the existing place
+-- v6: admin page — public.admins (by email), private.is_admin(), public.am_i_admin(); public.ads (slot, dates, enabled); admin RLS on stores, price_reports, official_prices; storage bucket ad-images (public read, admin write)

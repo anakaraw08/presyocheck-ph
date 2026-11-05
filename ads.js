@@ -1,7 +1,10 @@
-// Ad slots and the pop-up ad. Edit AD_CONFIG to plug in real ads.
-// Any element with data-ad="<slot>" in the pages is filled from here.
-//
-// For each ad:
+// Ad slots and the pop-up ad. Real ads are managed on admin.html (table public.ads):
+// each has a slot, start and end date. Any element with data-ad="<slot>" is filled with a
+// running ad for that slot, or with the placeholder below when none is running.
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+import { SUPABASE_URL, SUPABASE_KEY } from './config.js';
+
+// Placeholders, used when no ad is running in a slot:
 //   href   where a tap goes (an advertiser's page; '#advertise' scrolls to the footer contact)
 //   image  an image URL for a real ad, or null to show the placeholder
 //   title / text   placeholder wording
@@ -44,7 +47,7 @@ function adBody(ad, { big = false } = {}) {
     el('span', { class: 'ad-ph-title', text: ad.title }),
     el('span', { class: 'ad-ph-text', text: ad.text }),
     big && ad.cta ? el('span', { class: 'btn primary ad-cta', text: ad.cta }) : null,
-    el('span', { class: 'ad-ph-size', text: ad.mobileSize && matchMedia('(max-width: 640px)').matches ? ad.mobileSize : ad.size }));
+    ad.real ? null : el('span', { class: 'ad-ph-size', text: ad.mobileSize && matchMedia('(max-width: 640px)').matches ? ad.mobileSize : ad.size }));
 }
 
 function adLink(ad, onclick, big) {
@@ -97,8 +100,33 @@ function showPopup() {
   dlg.querySelector('.ad-close').focus();
 }
 
-fillSlots();
-setTimeout(() => {
+/** Running ads from the database (RLS returns only enabled ads whose dates include today). */
+async function loadAds() {
+  try {
+    const db = createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false } });
+    const { data, error } = await db.from('ads').select('id,slot,title,body,cta,image_url,href');
+    if (error) throw error;
+    const bySlot = {};
+    for (const a of data) (bySlot[a.slot] ||= []).push(a);
+    for (const [slot, list] of Object.entries(bySlot)) {
+      // Several ads in one slot take turns: each page load picks one at random.
+      const a = list[Math.floor(Math.random() * list.length)];
+      const base = slot === 'popup' ? AD_CONFIG.popup : AD_CONFIG.slots[slot];
+      if (!base) continue;
+      Object.assign(base, {
+        href: a.href || '#advertise', image: a.image_url, title: a.title || '', text: a.body || '',
+        cta: a.cta || (slot === 'popup' ? 'Learn more' : ''), real: true,
+      });
+    }
+  } catch (e) {
+    console.warn('Ads could not load; showing placeholders.', e);
+  }
+}
+
+fillSlots(); // placeholders straight away, so the layout doesn't jump
+const adsReady = loadAds().then(fillSlots);
+setTimeout(async () => {
+  await adsReady;
   // Don't cover the report form if someone opened it already
   if (document.querySelector('dialog[open]')) return;
   showPopup();

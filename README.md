@@ -89,13 +89,38 @@ update stores set lat = 14.6612, lng = 121.1101 where id = '...';
 update stores set name = 'Puregold Extra Parang', barangay_id = 'marikina-parang' where id = '...';
 ```
 
+## Admin page
+
+`admin.html` (not linked from the site; add `/admin.html` to the address) has four sections:
+
+- **Ads**: create banner and pop-up ads with an image (uploaded, up to 2 MB) or a headline, a link,
+  and a start and end date. Each ad shows as Running, Scheduled, Ended or Off. Untick "Switched on"
+  to pause one without deleting it.
+- **Reports**: the latest 200 price reports, searchable by store; hide spam or show it again.
+- **Stores**: rename, change type or barangay, fix the street, hide a store, or clear a wrong pin
+  so visitors can place it again.
+- **Official prices**: add DA, SRA, DTI or weekly DOE figures; the site uses the newest one.
+
+Sign-in uses Supabase Auth with email and password. Only emails in `public.admins` can change
+anything, and the database checks this on every change (row-level security), not just the page.
+
+To set up your login: Supabase dashboard → Authentication → Users → Add user → Create new user,
+with your email and a strong password, and tick "Auto Confirm User". Then turn off public sign-ups
+(Authentication → Sign In / Providers → "Allow new users to sign up"). To add another admin:
+
+```sql
+insert into admins (email) values ('their.email@example.com');
+```
+
 ## Ads
 
 Each page has two banner slots (`<aside data-ad="top">`, `<aside data-ad="bottom">`) and a pop-up ad
 shown shortly after the page opens. The pop-up closes with ✕, Esc or a tap outside it, and is shown
 once per browser session (`onceEvery: 'load'` shows it on every page load). Tapping any ad follows
-its `href`. All of them are placeholders until you set `image` and `href` in `AD_CONFIG` in `ads.js`;
-external links open in a new tab marked `rel="sponsored"`. Put your contact in the footer's
+its `href`. Real ads come from the admin page (table `ads`): visitors only ever receive ads that
+are switched on and whose dates include today (Philippine time). Several running ads in one slot
+take turns at random. With none running, a slot shows the placeholder from `AD_CONFIG` in `ads.js`.
+External links open in a new tab marked `rel="sponsored"`. Put your contact in the footer's
 "Advertise here" line (`[YOUR EMAIL OR PAGE]` in each page).
 
 ## Run it on your computer
