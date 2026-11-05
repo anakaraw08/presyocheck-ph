@@ -33,7 +33,9 @@ const state = {
   category: '',
   kind: '',
   sortItem: null,
+  compare: [], // store ids: the chosen store first, then up to MAX_EXTRA others
 };
+const MAX_EXTRA = 4;
 
 // ---------- helpers ----------
 const $ = (id) => document.getElementById(id);
@@ -131,7 +133,11 @@ async function loadCity(cityId) {
   state.reports = reports.data;
 }
 
+const storeById = (id) => state.stores.find((s) => s.id === id);
+const comparing = () => state.compare.length > 0;
+
 function visibleStores() {
+  if (comparing()) return state.compare.map(storeById).filter(Boolean);
   return state.stores.filter((s) =>
     (!state.barangay || s.barangay_id === state.barangay) &&
     (!state.kind || s.kind === state.kind));
@@ -189,19 +195,28 @@ function render() {
   const stores = visibleStores();
   const items = visibleItems();
   const { matrix, reportCount } = buildGrid(stores, items);
-  const ordered = orderStores(stores, matrix, state.sortItem);
+  // When comparing, the chosen store stays in the first column; the others are sorted after it.
+  const ordered = comparing()
+    ? [stores[0], ...orderStores(stores.slice(1), matrix, state.sortItem)].filter(Boolean)
+    : orderStores(stores, matrix, state.sortItem);
+  const scores = ordered.map((s) => matrix.storeScore(s.id).score).filter((x) => x !== null);
+  const bestScore = scores.length ? Math.min(...scores) : null;
 
   $('view').hidden = false;
-  $('title').textContent = SECTION === 'fuel' ? `Gas prices in ${placeName()}` : `Prices in ${placeName()}`;
+  const where = comparing() ? cityById(state.city).name : placeName();
+  $('title').textContent = SECTION === 'fuel' ? `Gas prices in ${where}` : `Prices in ${where}`;
   const storeWord = (n) => `${n} ${CONF.storeWord}${n === 1 ? '' : 's'}`;
+  const lead = comparing() ? `Comparing ${storeWord(stores.length)}` : storeWord(stores.length);
   $('sub').textContent = reportCount
-    ? `${storeWord(stores.length)} · ${reportCount} reported price${reportCount === 1 ? '' : 's'} in the last ${CONF.windowDays} days`
-    : `${storeWord(stores.length)} listed · no prices reported in the last ${CONF.windowDays} days yet. Tap any cell to add the first one.`;
+    ? `${lead} · ${reportCount} reported price${reportCount === 1 ? '' : 's'} in the last ${CONF.windowDays} days`
+    : `${lead}${comparing() ? '' : ' listed'} · no prices reported in the last ${CONF.windowDays} days yet. Tap any cell to add the first one.`;
+  renderCompareBar();
 
   const sortItem = state.sortItem && itemById(state.sortItem);
   $('sort-label').textContent = sortItem
     ? `${CONF.storeWord[0].toUpperCase() + CONF.storeWord.slice(1)}s sorted by ${sortItem.name} price, lowest to highest.`
     : `${CONF.storeWord[0].toUpperCase() + CONF.storeWord.slice(1)}s sorted from usually cheapest to most expensive.`;
+  if (comparing() && stores.length > 1) $('sort-label').textContent = 'Your pick first, then the others ' + (sortItem ? `by ${sortItem.name} price, lowest to highest.` : 'from usually cheapest to most expensive.');
   $('sort-reset').hidden = !sortItem;
 
   $('no-stores').hidden = stores.length > 0;
@@ -214,13 +229,20 @@ function render() {
     const { score, vsAverage, compared } = matrix.storeScore(s.id);
     const tier = priceTier(vsAverage, compared);
     const b = brgyById(s.barangay_id);
-    const where = [!state.barangay && b ? b.name : null, s.address].filter(Boolean).join(' · ');
-    head.append(el('th', { scope: 'col', class: 'store-col', title: s.address || '' },
+    const where = [(!state.barangay || comparing()) && b ? b.name : null, s.address].filter(Boolean).join(' · ');
+    const isMain = comparing() && i === 0;
+    const isBest = score !== null && score === bestScore;
+    const action = comparing()
+      ? el('button', { type: 'button', class: 'col-action', 'aria-label': `Remove ${s.name} from the comparison`, title: 'Remove from comparison', onclick: () => removeCompare(s.id), text: '✕' })
+      : el('button', { type: 'button', class: 'col-action compare', title: `Compare ${s.name} with up to ${MAX_EXTRA} other ${CONF.storeWord}s`, onclick: () => startCompare(s.id), text: 'Compare' });
+    head.append(el('th', { scope: 'col', class: 'store-col' + (isMain ? ' main' : ''), title: s.address || '' },
+      action,
+      isMain ? el('span', { class: 'main-tag', text: 'Your pick' }) : null,
       el('span', { class: 'store-name' }, el('span', { class: 'dot ' + s.kind }), s.name,
         tier ? el('b', { class: 'pin t' + tier, title: ['', 'Budget', 'Typical', 'Pricier'][tier] + ' for this area', text: '₱'.repeat(tier) }) : null),
       el('span', { class: 'store-meta', text: KINDS[s.kind] + (where ? ' · ' + where : '') }),
       score !== null && !state.sortItem
-        ? el('span', { class: 'rank' + (i === 0 ? ' top' : ''), text: i === 0 ? 'Usually cheapest' : `About +${Math.round((score - 1) * 100)}% vs lowest` })
+        ? el('span', { class: 'rank' + (isBest ? ' top' : ''), text: isBest ? (comparing() ? 'Cheapest of these' : 'Usually cheapest') : `About +${Math.round((score - 1) * 100)}% vs lowest` })
         : null));
   });
   $('grid').tHead.replaceChildren(head);
@@ -269,6 +291,65 @@ function render() {
   $('grid').tBodies[0].replaceChildren(...rows);
 }
 
+// ---------- comparing chosen stores ----------
+/** A store dropdown for the whole city, grouped by barangay (the selected one first). */
+function storeOptions(placeholder) {
+  const taken = new Set(state.compare);
+  const pool = state.stores.filter((s) => !taken.has(s.id) && (!state.kind || s.kind === state.kind));
+  const groups = new Map();
+  for (const s of pool) {
+    const key = s.barangay_id || '';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(s);
+  }
+  const keys = [...groups.keys()].sort((a, z) =>
+    (z === state.barangay) - (a === state.barangay) ||
+    (brgyById(a)?.name || '~').localeCompare(brgyById(z)?.name || '~'));
+  return [
+    el('option', { value: '', text: placeholder }),
+    ...keys.map((k) => el('optgroup', { label: brgyById(k)?.name || 'Other' },
+      ...groups.get(k).map((s) => el('option', { value: s.id, text: `${s.name} · ${KINDS[s.kind]}` })))),
+  ];
+}
+
+function renderCompareBar() {
+  const bar = $('compare-bar');
+  const word = CONF.storeWord;
+  if (!comparing()) {
+    const sel = el('select', { id: 'compare-pick', 'aria-label': `Choose a ${word} to compare` }, ...storeOptions(`Choose a ${word}…`));
+    sel.addEventListener('change', () => sel.value && startCompare(sel.value));
+    bar.replaceChildren(el('span', { class: 'compare-label', text: 'Compare' }), sel,
+      el('span', { class: 'muted small', text: `Pick a ${word}, then add up to ${MAX_EXTRA} others to see them side by side.` }));
+    return;
+  }
+  const chips = state.compare.map(storeById).filter(Boolean).map((s, i) =>
+    el('span', { class: 'chip' + (i === 0 ? ' main' : '') },
+      i === 0 ? el('b', { text: 'Your pick: ' }) : null, s.name,
+      el('button', { type: 'button', class: 'chip-x', 'aria-label': `Remove ${s.name}`, onclick: () => removeCompare(s.id), text: '✕' })));
+  const left = MAX_EXTRA + 1 - state.compare.length;
+  const add = left > 0
+    ? el('select', { id: 'compare-add', 'aria-label': `Add a ${word} to the comparison` }, ...storeOptions(`+ Add a ${word} (${left} more)`))
+    : el('span', { class: 'muted small', text: `That's the most: ${MAX_EXTRA + 1} ${word}s.` });
+  if (left > 0) add.addEventListener('change', () => add.value && addCompare(add.value));
+  bar.replaceChildren(el('span', { class: 'compare-label', text: 'Comparing' }), ...chips, add,
+    el('button', { type: 'button', class: 'link', onclick: clearCompare, text: `Show all ${word}s` }));
+}
+
+function setCompare(ids) {
+  state.compare = ids;
+  syncUrl();
+  render();
+  $('grid-wrap').scrollLeft = 0;
+}
+const startCompare = (id) => setCompare([id]);
+const addCompare = (id) => {
+  if (state.compare.includes(id) || state.compare.length > MAX_EXTRA) return;
+  setCompare([...state.compare, id]);
+  $('compare-add')?.focus();
+};
+const removeCompare = (id) => setCompare(state.compare.filter((x) => x !== id));
+const clearCompare = () => setCompare([]);
+
 // ---------- navigation ----------
 function syncUrl() {
   const p = new URLSearchParams();
@@ -277,6 +358,7 @@ function syncUrl() {
   if (state.category) p.set('cat', state.category);
   if (state.kind) p.set('type', state.kind);
   if (state.sortItem) p.set('sort', state.sortItem);
+  if (comparing()) p.set('cmp', state.compare.join(','));
   history.replaceState(null, '', '?' + p.toString());
   // Keep the place when switching between the food and gas pages.
   const place = new URLSearchParams({ city: state.city });
@@ -293,6 +375,7 @@ function syncUrl() {
 }
 
 async function selectCity(cityId, barangayId = '') {
+  if (cityId !== state.city) state.compare = [];
   state.city = cityId;
   state.barangay = barangayId && brgyById(barangayId)?.city_id === cityId ? barangayId : '';
   $('city').value = cityId;
@@ -301,6 +384,8 @@ async function selectCity(cityId, barangayId = '') {
   setStatus('Loading prices…');
   try {
     await loadCity(cityId);
+    state.compare = state.compare.filter(storeById); // drop links to stores that are gone
+    syncUrl();
     setStatus('');
     render();
   } catch (e) {
@@ -458,6 +543,7 @@ async function init() {
   state.category = params.get('cat') && state.items.some((i) => i.category === params.get('cat')) ? params.get('cat') : '';
   state.kind = CONF.kinds.includes(params.get('type')) ? params.get('type') : '';
   state.sortItem = itemById(params.get('sort')) ? params.get('sort') : null;
+  state.compare = [...new Set((params.get('cmp') || '').split(',').filter(Boolean))].slice(0, MAX_EXTRA + 1);
   state.city = city;
   state.barangay = brgy && brgyById(brgy)?.city_id === city ? brgy : '';
   renderPickers();

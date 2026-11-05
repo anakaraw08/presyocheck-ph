@@ -15,6 +15,11 @@ Each page is a table with a row per product and a column per store. Stores are s
 cheapest to most expensive; tap a product to sort them by that product's price, lowest first. The
 lowest price in each row is green, the highest red. Tap an empty cell to add a price for that store.
 
+To compare specific stores, pick one in the **Compare** bar (or tap **Compare** on its column), then
+add up to 4 more from anywhere in the city. The table then shows only those columns, with your pick
+first, and the green/red highlights compare just those stores. The choice is kept in the link
+(`?cmp=<id>,<id>…`), so a comparison can be shared.
+
 ## How it is put together
 
 | File | What it does |

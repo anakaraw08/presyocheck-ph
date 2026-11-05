@@ -491,3 +491,26 @@ main.wrap {
   .ad-popup[open] { animation: ad-in .22s ease-out; }
   @keyframes ad-in { from { opacity: 0; transform: translateY(10px) scale(.98); } to { opacity: 1; transform: none; } }
 }
+
+/* Compare chosen stores */
+.compare-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px;
+  margin: 0 0 10px; padding: 10px 12px; border-radius: 12px;
+  background: var(--gold-soft); border: 1.5px solid var(--gold);
+}
+.compare-label { font-weight: 700; font-size: .9rem; }
+.compare-bar select { font: inherit; font-size: .9rem; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--gold); background: var(--panel); color: var(--fg); max-width: 100%; }
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 4px 4px 10px; border-radius: 999px; background: var(--panel); border: 1.5px solid var(--gold); font-size: .85rem; }
+.chip.main { border-color: var(--ph-blue); }
+.chip.main b { color: var(--ph-blue); font-weight: 700; }
+.chip-x, .col-action { font: inherit; line-height: 1; cursor: pointer; border: 0; background: none; color: var(--muted); }
+.chip-x { width: 22px; height: 22px; border-radius: 50%; font-size: .75rem; }
+.chip-x:hover, .col-action:hover { color: var(--bad); background: var(--worst-bg); }
+.grid .store-col { position: sticky; }
+.grid thead .store-col { padding-right: 26px; }
+.col-action { position: absolute; top: 6px; right: 4px; padding: 3px 5px; border-radius: 6px; font-size: .72rem; }
+.col-action.compare { position: static; display: inline-block; margin: 0 0 6px -5px; color: var(--ph-blue); font-weight: 700; border: 1px solid var(--line); }
+.col-action.compare:hover { color: var(--panel); background: var(--ph-blue); }
+.store-col.main { box-shadow: inset 0 3px 0 var(--ph-blue); }
+.main-tag { display: block; font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--ph-blue); margin-bottom: 3px; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .chip.main b, :root:not([data-theme="light"]) .main-tag { color: var(--sun); } }
